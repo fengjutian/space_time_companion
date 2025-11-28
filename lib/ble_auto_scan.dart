@@ -6,8 +6,10 @@ import 'database.dart';
 class BleAutoScanner {
   Timer? _timer;
   int scanBatch = 0; // 每次扫描计数
+  bool get isRunning => _timer != null;
 
   void start() {
+    if (_timer != null) return;
     // 每 1 分钟扫描一次
     _timer = Timer.periodic(Duration(minutes: 1), (_) {
       runScan();
@@ -19,6 +21,10 @@ class BleAutoScanner {
 
   void stop() {
     _timer?.cancel();
+    _timer = null;
+    try {
+      FlutterBluePlus.stopScan();
+    } catch (_) {}
   }
 
   void runScan() async {

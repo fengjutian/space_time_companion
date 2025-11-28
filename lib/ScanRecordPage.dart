@@ -10,6 +10,7 @@ class ScanRecordPage extends StatefulWidget {
 
 class _ScanRecordPageState extends State<ScanRecordPage> {
   List<Map<String, dynamic>> records = [];
+  bool running = bleScanner.isRunning;
 
   @override
   void initState() {
@@ -45,9 +46,16 @@ class _ScanRecordPageState extends State<ScanRecordPage> {
         title: Text("蓝牙扫描记录"),
         actions: [
           IconButton(
-            icon: Icon(Icons.play_arrow),
+            icon: Icon(running ? Icons.pause : Icons.play_arrow),
             onPressed: () {
-              bleScanner.start();
+              if (running) {
+                bleScanner.stop();
+              } else {
+                bleScanner.start();
+              }
+              setState(() {
+                running = bleScanner.isRunning;
+              });
             },
           ),
         ],
@@ -88,6 +96,19 @@ class _ScanRecordPageState extends State<ScanRecordPage> {
             );
           }).toList(),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          if (running) {
+            bleScanner.stop();
+          } else {
+            bleScanner.start();
+          }
+          setState(() {
+            running = bleScanner.isRunning;
+          });
+        },
+        child: Icon(running ? Icons.pause : Icons.play_arrow),
       ),
     );
   }
