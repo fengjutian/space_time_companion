@@ -7,6 +7,21 @@ class BleAutoScanner {
   Timer? _timer;
   int scanBatch = 0; // 每次扫描计数
   bool get isRunning => _timer != null;
+  bool _scanInProgress = false;
+  StreamSubscription<List<ScanResult>>? _sub;
+
+  BleAutoScanner() {
+    _sub = FlutterBluePlus.scanResults.listen((results) async {
+      for (var r in results) {
+        await DBHelper.insertScan(
+          name: r.device.platformName,
+          deviceId: r.device.remoteId.str,
+          rssi: r.rssi,
+          batch: scanBatch,
+        );
+      }
+    });
+  }
 
   void start() {
     if (_timer != null) return;
@@ -28,21 +43,13 @@ class BleAutoScanner {
   }
 
   void runScan() async {
+    if (_scanInProgress) return;
+    _scanInProgress = true;
     scanBatch++;
     debugPrint("开始第 $scanBatch 次扫描");
-
-    // 5 秒扫描时间
     FlutterBluePlus.startScan(timeout: Duration(seconds: 5));
-
-    FlutterBluePlus.scanResults.listen((results) async {
-      for (var r in results) {
-        await DBHelper.insertScan(
-          name: r.device.platformName,
-          deviceId: r.device.remoteId.str,
-          rssi: r.rssi,
-          batch: scanBatch,
-        );
-      }
+    Future.delayed(Duration(seconds: 6), () {
+      _scanInProgress = false;
     });
   }
 }
