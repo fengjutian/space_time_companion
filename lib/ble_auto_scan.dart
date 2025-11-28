@@ -40,3 +40,5 @@ class BleAutoScanner {
     });
   }
 }
+
+final BleAutoScanner bleScanner = BleAutoScanner();

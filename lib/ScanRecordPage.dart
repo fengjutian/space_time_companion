@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'ble_auto_scan.dart';
 import 'database.dart';
 
 class ScanRecordPage extends StatefulWidget {
@@ -40,7 +41,17 @@ class _ScanRecordPageState extends State<ScanRecordPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text("蓝牙扫描记录")),
+      appBar: AppBar(
+        title: Text("蓝牙扫描记录"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.play_arrow),
+            onPressed: () {
+              bleScanner.start();
+            },
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: loadData,
         child: ListView(
